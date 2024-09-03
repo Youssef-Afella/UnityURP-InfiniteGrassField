@@ -1,0 +1,29 @@
+﻿#pragma kernel CSMain
+
+float4x4 _VPMatrix;
+float _DrawDistance;
+
+float2 _CameraPositionXZ;
+int _CountSqrt;//it's whats called density in the script, changed the name just to have a more obvious meaning
+
+AppendStructuredBuffer<float3> _InstancesPosWSBuffer;
+
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+	//Here we do all the magic
+
+	float step = (_DrawDistance * 2) / float(_CountSqrt);//The width of a square in our grid
+	_CameraPositionXZ = floor(_CameraPositionXZ / step) * step;//Putting the point in it's closest position in the grid 
+
+	float2 positionXZ = (float2(id.x, id.y) / _CountSqrt) * 2 - 1;//Relative point position inside the square (going from -1 to 1)
+	positionXZ *= _DrawDistance;//Multiplying by the half of the width of the square
+	positionXZ += _CameraPositionXZ;//Adding offset to put the square in it's right position in the grid
+
+	float4 absPosCS = abs(mul(_VPMatrix, float4(positionXZ.x, 0, positionXZ.y, 1)));
+	//Testing if the point is in the frustrum of the camera (with a little offset cause we gonna add a random offset to that in the shader)
+	if (absPosCS.z <= absPosCS.w && absPosCS.y <= absPosCS.w * 1.5 && absPosCS.x <= absPosCS.w * 1.2 && absPosCS.w <= _DrawDistance) {
+		_InstancesPosWSBuffer.Append(float3(positionXZ.x, 0, positionXZ.y));
+	}
+}
+
