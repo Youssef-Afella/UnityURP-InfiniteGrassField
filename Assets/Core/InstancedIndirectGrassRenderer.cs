@@ -116,7 +116,7 @@ public class InstancedIndirectGrassRenderer : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
         }
     }
-
+    
     private void OnGUI()
     {
         GUI.contentColor = Color.black;
@@ -124,7 +124,7 @@ public class InstancedIndirectGrassRenderer : MonoBehaviour
         GUIStyle style = new GUIStyle();
         style.fontSize = 25;
 
-        GUIStyle style2 = new GUIStyle(EditorStyles.toggle);
+        GUIStyle style2 = new GUIStyle(GUI.skin.toggle);
         style2.fontSize = 25;
 
         GUI.Label(new Rect(50, 50, 400, 200),
@@ -152,7 +152,7 @@ public class InstancedIndirectGrassRenderer : MonoBehaviour
         GUI.Label(new Rect(550, 120, 200, 30), "Draw Distance: " + drawDistance, style);
         drawDistance = Mathf.Max(1, (int)(GUI.HorizontalSlider(new Rect(550, 160, 200, 30), drawDistance / 60, 1, 10)) * 60);
     }
-
+    
     void OnDisable()
     {
         if (instancesPosWSBuffer != null)
